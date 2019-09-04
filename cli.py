@@ -17,7 +17,7 @@ def check_args():
         parser.print_help()
         sys.exit(1)
     if args.year < 2009:
-        print 'ERROR: The script only works for the years 2009 to the present.'
+        print 'ERROR: The script only works for the years 2019 to the present.'
         sys.exit(1)
 
 check_args()

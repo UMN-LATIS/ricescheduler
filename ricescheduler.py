@@ -5,6 +5,7 @@ import arrow # http://crsmithdev.com/arrow/
 import pypandoc # https://github.com/bebraw/pypandoc
 from bs4 import BeautifulSoup
 from itertools import cycle
+import calendar
 
 def locale():
     return arrow.locales.get_locale('en_us')
@@ -14,8 +15,14 @@ def regex(keyword):
 
 def make_url(semester, year): 
     ''' Takes semester and year as strings, returns url to calendar '''
-    baseurl = 'https://registrar.rice.edu/calendars/'
-    url = baseurl + semester.lower() + year[-2:] + '/'
+    if semester == 'Fall' and year == '2019':
+        term = 10
+    elif semester == 'Spring' and year == '2020':
+        term = 11
+    elif semester == 'Summer' and year == '2020':
+        term = 12
+    baseurl = 'https://onestop.umn.edu/dates-and-deadlines?field_date_category_value=All&field_date_term_value='
+    url = baseurl + str(term)
     return url
 
 def date_formats():
@@ -49,9 +56,10 @@ def clean_cell(td):
 def parse_td_for_dates(td):
     ''' Get date or date range as lists from cell in registrar's table '''
     cell = clean_cell(td)
-    months = ['January', 'February', 'March', 'April', 'May',
-            'June', 'July', 'August', 'September', 'October', 'November', 'December']
-    ms = [locale().month_number(m) for m in months if m in cell]
+    abbr_to_num = {name: num for num, name in enumerate(calendar.month_abbr) if num}
+    months = ['Jan', 'Feb', 'Mar', 'Apr', 'May',
+            'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    ms = [abbr_to_num[m] for m in months if m in cell]
     ds = [int(d) for d in re.split('\D', cell) if 0 < len(d) < 3]
     ys = [int(y) for y in re.split('\D', cell) if len(y) == 4]
     dates = zip(cycle(ms), ds) if len(ds) > len(ms) else zip(ms, ds)
@@ -75,12 +83,12 @@ def parse_registrar_table(table):
                description = cells[1].get_text()
            except:
                pass
-           if re.match(regex('FIRST DAY OF CLASSES'), description):
+           if re.match(regex('sessions begin'), description):
                first_day = parse_td_for_dates(days)
-           if re.match(regex('LAST DAY OF CLASSES'), description):
+           if re.match(regex('Last day of instruction'), description):
                last_day = parse_td_for_dates(days)
            for date in parse_td_for_dates(days):
-               if re.match(regex('NO SCHEDULED CLASSES'), description):
+               if re.match(regex('University closed'), description) or re.match(regex('Spring break'), description):
                    no_classes.append(date)
     return first_day, last_day, no_classes
 

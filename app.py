@@ -10,7 +10,7 @@ app = Flask(__name__, static_url_path = "")
 
 @app.route('/')
 def form():
-    years = [str(y) for y in range(2009,2019)][::-1]
+    years = [str(y) for y in range(2019,2021)][::-1]
     months = ['January', 'February', 'March', 'April', 'May',
             'June', 'July', 'August', 'September', 'October', 'November', 'December']
     ddays = [str(d) for d in range(1,32)]
@@ -19,7 +19,7 @@ def form():
 
 @app.route('/generic/', methods=['GET'])
 def generic():
-    years = [str(y) for y in range(2009,2019)][::-1]
+    years = [str(y) for y in range(2019,2021)][::-1]
     months = ['January', 'February', 'March', 'April', 'May',
             'June', 'July', 'August', 'September', 'October', 'November', 'December']
     ddays = [str(d) for d in range(1,32)]
@@ -76,4 +76,4 @@ def classes():
     return '<br/>'.join(course)
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0', debug=True)
