@@ -1,0 +1,6 @@
+flask
+arrow
+bs4
+pypandoc
+uWSGI
+
